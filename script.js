@@ -1,9 +1,10 @@
 let isDOBOpen = false;
 let dateOfBirth;
-const settingCogEl = document.getElementById("settingIcon");
+
+const settingGearEl = document.getElementById("settingIcon");
 const settingContentEl = document.getElementById("settingContent");
 const initialTextEl = document.getElementById("initialText");
-const afterDOBBtnTxtEl = document.getElementById("afterDOBBtnTxt");
+const afterDOBbtnTxtEl = document.getElementById("afterDOBBtnTxt");
 const dobButtonEl = document.getElementById("dobButton");
 const dobInputEl = document.getElementById("dobInput");
 
@@ -14,21 +15,17 @@ const hourEl = document.getElementById("hour");
 const minuteEl = document.getElementById("minute");
 const secondEl = document.getElementById("second");
 
-console.log(localStorage.getItem("year"));
-
 const makeTwoDigitNumber = (number) => {
-  return number > 9 ? number : `0${number}`;
+    return number > 9 ? number : `0${number}`;
 };
 
 const toggleDateOfBirthSelector = () => {
-  if (isDOBOpen) {
-    settingContentEl.classList.add("hide");
-  } else {
-    settingContentEl.classList.remove("hide");
-  }
-  isDOBOpen = !isDOBOpen;
-
-  console.log("Toggle", isDOBOpen);
+    if (isDOBOpen) {
+        settingContentEl.classList.add("hide");
+    } else {
+        settingContentEl.classList.remove("hide");
+    }
+    isDOBOpen = !isDOBOpen;
 };
 
 const updateAge = () => {
@@ -74,47 +71,51 @@ const updateAge = () => {
     secondEl.innerHTML = makeTwoDigitNumber(seconds);
 };
 
-
-
+// ✅ This function was missing earlier
 const localStorageGetter = () => {
-  const year = localStorage.getItem("year");
-  const month = localStorage.getItem("month");
-  const date = localStorage.getItem("date");
-  if (year && month && date) {
-    dateOfBirth = new Date(year, month, date);
-  }
+    const year = localStorage.getItem("year");
+    const month = localStorage.getItem("month");
+    const date = localStorage.getItem("date");
 
-  updateAge();
+    if (year && month && date) {
+        dateOfBirth = new Date(year, month, date);
+    }
 };
 
-const contentToggler = () => {
-  updateAge();
-  if (dateOfBirth) {
-    initialTextEl.classList.add("hide");
-    afterDOBBtnTxtEl.classList.remove("hide");
-  } else {
-    afterDOBBtnTxtEl.classList.add("hide");
-    initialTextEl.classList.remove("hide");
-  }
-};
-
-const setDOBHandler = () => {
-  const dateString = dobInputEl.value;
-
-  dateOfBirth = dateString ? new Date(dateString) : null;
-
-  if (dateOfBirth) {
-    localStorage.setItem("year", dateOfBirth.getFullYear());
-    localStorage.setItem("month", dateOfBirth.getMonth());
-    localStorage.setItem("date", dateOfBirth.getDate());
-  }
-
-  contentToggler();
-  setInterval(() => updateAge(), 1000);
-};
-
+// ✅ On page load, get DOB and update UI if DOB exists
 localStorageGetter();
-contentToggler();
 
-settingCogEl.addEventListener("click", toggleDateOfBirthSelector);
-dobButtonEl.addEventListener("click", setDOBHandler);
+if (dateOfBirth) {
+    initialTextEl.classList.add("hide");
+    afterDOBbtnTxtEl.classList.remove("hide");
+    updateAge();
+    setInterval(() => updateAge(), 1000);
+} else {
+    initialTextEl.classList.remove("hide");
+    afterDOBbtnTxtEl.classList.add("hide");
+}
+
+// ✅ Called only on user click
+const setDOBhandler = () => {
+    const dateString = dobInputEl.value;
+    dateOfBirth = dateString ? new Date(dateString) : null;
+
+    if (dateOfBirth) {
+        localStorage.setItem("year", dateOfBirth.getFullYear());
+        localStorage.setItem("month", dateOfBirth.getMonth());
+        localStorage.setItem("date", dateOfBirth.getDate());
+
+        initialTextEl.classList.add("hide");
+        afterDOBbtnTxtEl.classList.remove("hide");
+
+        updateAge();
+        clearInterval(window.ageInterval); // prevent multiple intervals
+        window.ageInterval = setInterval(() => updateAge(), 1000);
+    } else {
+        afterDOBbtnTxtEl.classList.add("hide");
+        initialTextEl.classList.remove("hide");
+    }
+};
+
+settingGearEl.addEventListener("click", toggleDateOfBirthSelector);
+dobButtonEl.addEventListener("click", setDOBhandler);
