@@ -32,22 +32,49 @@ const toggleDateOfBirthSelector = () => {
 };
 
 const updateAge = () => {
-  const currentDate = new Date();
-  const dateDiff = currentDate - dateOfBirth;
-  const year = Math.floor(dateDiff / (1000 * 60 * 60 * 24 * 365));
-  const month = Math.floor((dateDiff / (1000 * 60 * 60 * 24 * 365)) % 12);
-  const day = Math.floor(dateDiff / (1000 * 60 * 60 * 24)) % 30;
-  const hour = Math.floor(dateDiff / (1000 * 60 * 60)) % 24;
-  const minute = Math.floor(dateDiff / (1000 * 60)) % 60;
-  const second = Math.floor(dateDiff / 1000) % 60;
+    const now = new Date();
+    let years = now.getFullYear() - dateOfBirth.getFullYear();
+    let months = now.getMonth() - dateOfBirth.getMonth();
+    let days = now.getDate() - dateOfBirth.getDate();
+    let hours = now.getHours() - dateOfBirth.getHours();
+    let minutes = now.getMinutes() - dateOfBirth.getMinutes();
+    let seconds = now.getSeconds() - dateOfBirth.getSeconds();
 
-  yearEl.innerHTML = makeTwoDigitNumber(year);
-  monthEl.innerHTML = makeTwoDigitNumber(month);
-  dayEl.innerHTML = makeTwoDigitNumber(day);
-  hourEl.innerHTML = makeTwoDigitNumber(hour);
-  minuteEl.innerHTML = makeTwoDigitNumber(minute);
-  secondEl.innerHTML = makeTwoDigitNumber(second);
+    if (seconds < 0) {
+        seconds += 60;
+        minutes--;
+    }
+
+    if (minutes < 0) {
+        minutes += 60;
+        hours--;
+    }
+
+    if (hours < 0) {
+        hours += 24;
+        days--;
+    }
+
+    if (days < 0) {
+        const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += previousMonth.getDate();
+        months--;
+    }
+
+    if (months < 0) {
+        months += 12;
+        years--;
+    }
+
+    yearEl.innerHTML = makeTwoDigitNumber(years);
+    monthEl.innerHTML = makeTwoDigitNumber(months);
+    dayEl.innerHTML = makeTwoDigitNumber(days);
+    hourEl.innerHTML = makeTwoDigitNumber(hours);
+    minuteEl.innerHTML = makeTwoDigitNumber(minutes);
+    secondEl.innerHTML = makeTwoDigitNumber(seconds);
 };
+
+
 
 const localStorageGetter = () => {
   const year = localStorage.getItem("year");
